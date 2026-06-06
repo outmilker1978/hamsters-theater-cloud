@@ -31,6 +31,7 @@ io.on('connection', (socket) => {
     const others = rooms[roomId].filter(id => id !== socket.id);
     socket.emit('room-users', others);
     socket.to(roomId).emit('user-joined', socket.id);
+    socket.to(roomId).emit('peer-joined', socket.id);
   });
 
   socket.on('offer', (data) => {
