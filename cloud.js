@@ -24,11 +24,13 @@ io.on('connection', (socket) => {
     console.log('[Cloud] join-room: roomId=' + roomId + ' rooms=' + JSON.stringify(Object.keys(rooms)));
     socket.emit('server-log', '[Cloud] join-room: roomId=' + roomId + ' rooms=' + JSON.stringify(Object.keys(rooms)));
     if (!rooms[roomId]) { socket.emit('error-msg', 'Комната не найдена'); return; }
-    if (rooms[roomId].length >= 2) { socket.emit('error-msg', 'Комната уже заполнена'); return; }
+    if (rooms[roomId].length >= 5) { socket.emit('error-msg', 'Комната уже заполнена'); return; }
     rooms[roomId].push(socket.id);
     socket.join(roomId);
     socket.emit('joined', roomId);
-    socket.to(roomId).emit('peer-joined', socket.id);
+    const others = rooms[roomId].filter(id => id !== socket.id);
+    socket.emit('room-users', others);
+    socket.to(roomId).emit('user-joined', socket.id);
   });
 
   socket.on('offer', (data) => {
